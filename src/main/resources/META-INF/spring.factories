@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.zondy.boot.autoconfigure.ElasticsearchAutoConfiguration
+org.springframework.context.ApplicationListener=\
+  com.zondy.boot.autoconfigure.ExcludePrimitiveElasticListener
