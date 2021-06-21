@@ -1,6 +1,7 @@
 package com.zondy.boot.autoconfigure;
 
 import com.zondy.boot.service.ElasticsearchService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,8 +16,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(ElasticsearchProperties.class)
-@ConditionalOnMissingBean(ElasticsearchService.class)
-@ConditionalOnProperty(prefix ="liqin.elasticsearch.starter.enable",havingValue = "true",value = "true",matchIfMissing = true)
+@ConditionalOnClass(ElasticsearchService.class)
+@ConditionalOnProperty(prefix ="liqin.elasticsearch.starter",name = "enable",havingValue = "true",matchIfMissing = true)
 public class ElasticsearchAutoConfiguration {
 
     final ElasticsearchProperties elasticsearchProperties;
@@ -26,6 +27,7 @@ public class ElasticsearchAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public ElasticsearchService elasticsearchService(){
         return new ElasticsearchService(elasticsearchProperties);
     }
