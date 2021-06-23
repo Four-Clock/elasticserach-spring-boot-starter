@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(ElasticsearchProperties.class)
-@ConditionalOnClass(ElasticsearchService.class)
 @ConditionalOnProperty(prefix ="liqin.elasticsearch.starter",name = "enable",havingValue = "true",matchIfMissing = true)
 public class ElasticsearchAutoConfiguration {
 
