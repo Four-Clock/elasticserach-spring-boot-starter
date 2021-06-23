@@ -338,7 +338,7 @@ public class ElasticsearchService {
      * @return PageView<Map<String, Object>>
      */
     public PageView<Map<String, Object>> matchQuery(MatchCondition matchQueryCondition, IResolveAdapterESDataRecord... resolve) {
-        if (matchQueryCondition.checkQueryCondition()) {
+        if (!matchQueryCondition.checkQueryCondition()) {
             throw new IllegalArgumentException("查询参数有误，请检查查询参数");
         }
         PageView<Map<String, Object>> elasticResponseData = new PageView<>();
@@ -379,7 +379,7 @@ public class ElasticsearchService {
      * @return
      */
     public PageView<Map<String, Object>> matchQueryString(QueryStringCondition queryStringCondition, IResolveAdapterESDataRecord... resolve){
-        if (queryStringCondition.checkQueryCondition()) {
+        if (!queryStringCondition.checkQueryCondition()) {
             throw new IllegalArgumentException("查询参数有误，请检查查询参数");
         }
         PageView<Map<String, Object>> elasticResponseData = new PageView<>();
