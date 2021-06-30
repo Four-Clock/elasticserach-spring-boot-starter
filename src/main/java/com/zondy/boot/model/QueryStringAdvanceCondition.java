@@ -22,6 +22,7 @@ public class QueryStringAdvanceCondition extends CommonCondition implements Abst
     private List<MatchPhraseFieldItem> matchPhraseFieldItems;
     private String postTags;
     private String preTags;
+    private boolean withSourceText;
 
     @Override
     public boolean checkQueryCondition() {
@@ -30,7 +31,7 @@ public class QueryStringAdvanceCondition extends CommonCondition implements Abst
 
     @Override
     public HighLightConfig getHighLightConfig() {
-        return getHighLightConfig(matchFieldItems, matchPhraseFieldItems, postTags, preTags);
+        return getHighLightConfig(matchFieldItems, matchPhraseFieldItems, postTags, preTags,withSourceText);
 
     }
 }

@@ -19,6 +19,7 @@ public class MatchCondition extends BaseCondition implements IHighlightEnabled {
     private String postTags;
     private String preTags;
     private boolean isFullMatch = false;
+    private boolean withSourceText;
 
     @Override
     public boolean checkQueryCondition() {
@@ -27,6 +28,6 @@ public class MatchCondition extends BaseCondition implements IHighlightEnabled {
 
     @Override
     public HighLightConfig getHighLightConfig() {
-        return new HighLightConfig(multiFields, multiFields, postTags, preTags);
+        return new HighLightConfig(multiFields, multiFields, postTags, preTags,withSourceText);
     }
 }

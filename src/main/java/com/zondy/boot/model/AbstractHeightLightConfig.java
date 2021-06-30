@@ -21,7 +21,7 @@ public interface  AbstractHeightLightConfig extends IHighlightEnabled {
      * @param preTags
      * @return
      */
-     default HighLightConfig getHighLightConfig(List<MatchFieldItem> matchFieldItems, List<MatchPhraseFieldItem> matchPhraseFieldItems, String postTags, String preTags) {
+     default HighLightConfig getHighLightConfig(List<MatchFieldItem> matchFieldItems, List<MatchPhraseFieldItem> matchPhraseFieldItems, String postTags, String preTags,boolean withSourceText) {
         List<String> heightFields = new ArrayList<>();
         if (matchFieldItems != null && matchFieldItems.size() > 0) {
             for (MatchFieldItem matchFieldItem : matchFieldItems) {
@@ -34,7 +34,7 @@ public interface  AbstractHeightLightConfig extends IHighlightEnabled {
             }
         }
         if(heightFields.size()>0){
-            return new HighLightConfig(null, heightFields.toArray(new String[heightFields.size()]), postTags, preTags);
+            return new HighLightConfig(null, heightFields.toArray(new String[heightFields.size()]), postTags, preTags,withSourceText);
         }else {
             return null;
         }

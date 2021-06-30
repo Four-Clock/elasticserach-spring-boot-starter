@@ -22,6 +22,7 @@ public class QueryStringCondition  extends CommonCondition implements IHighlight
     private String[] hightFields;
     private String postTags;
     private String preTags;
+    private boolean withSourceText;
 
     @Override
     public boolean checkQueryCondition() {
@@ -30,6 +31,6 @@ public class QueryStringCondition  extends CommonCondition implements IHighlight
 
     @Override
     public HighLightConfig getHighLightConfig() {
-        return new HighLightConfig(matchFields, hightFields, postTags, preTags);
+        return new HighLightConfig(matchFields, hightFields, postTags, preTags,withSourceText);
     }
 }

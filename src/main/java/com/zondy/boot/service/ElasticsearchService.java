@@ -12,6 +12,7 @@ import com.zondy.boot.model.CommonCondition;
 import com.zondy.boot.model.FieldType;
 import com.zondy.boot.model.GeoCondition;
 import com.zondy.boot.model.GeoMatchQueryCondition;
+import com.zondy.boot.model.HighLightConfig;
 import com.zondy.boot.model.MapAggregation;
 import com.zondy.boot.model.MatchCondition;
 import com.zondy.boot.model.QueryItem;
@@ -323,7 +324,7 @@ public class ElasticsearchService {
         searchSourceBuilder.query(queryBuilder);
         QueryDataUtils.resolveQueryCondition(searchRequest, searchSourceBuilder, commonQueryCondition);
         try {
-            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, false, resolve);
+            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, null, resolve);
         } catch (Exception ex) {
             LOGGER.error("query document is error commonQueryCondition:{}" ,JSON.toJSONString(commonQueryCondition), ex);
             throw new RuntimeException(ex);
@@ -364,7 +365,7 @@ public class ElasticsearchService {
         }
         QueryDataUtils.resolveQueryCondition(searchRequest, searchSourceBuilder, matchQueryCondition);
         try {
-            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, true, resolve);
+            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, matchQueryCondition.getHighLightConfig(), resolve);
         } catch (Exception ex) {
             LOGGER.error("query document is exception :" + ex.getMessage(), ex);
             throw new RuntimeException(ex);
@@ -387,7 +388,7 @@ public class ElasticsearchService {
         SearchRequest searchRequest = new SearchRequest();
         QueryDataUtils.resolveQueryCondition(searchRequest, QueryDataUtils.searchBuilder(queryStringCondition), queryStringCondition);
         try {
-            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, true, resolve);
+            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, queryStringCondition.getHighLightConfig(), resolve);
         } catch (Exception ex) {
             LOGGER.error("query document is error  queryStringCondition:{}" ,JSON.toJSONString(queryStringCondition), ex);
             throw new RuntimeException(ex.getMessage());
@@ -411,7 +412,7 @@ public class ElasticsearchService {
         SearchRequest searchRequest = new SearchRequest();
         QueryDataUtils.resolveQueryCondition(searchRequest, QueryDataUtils.searchAdvanceBuilder(queryStringCondition), queryStringCondition);
         try {
-            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, true, resolve);
+            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, queryStringCondition.getHighLightConfig(), resolve);
         } catch (Exception ex) {
             LOGGER.error("query document is error :{}" ,JSON.toJSONString(queryStringCondition), ex);
             throw new RuntimeException(ex.getMessage());
@@ -438,7 +439,7 @@ public class ElasticsearchService {
         searchSourceBuilder.query(queryBuilder);
         QueryDataUtils. resolveQueryCondition(searchRequest, searchSourceBuilder, geoQueryCondition);
         try {
-           responseDataUtils.wrapElasticResponse(searchRequest, elasticResponse, false, resolve);
+           responseDataUtils.wrapElasticResponse(searchRequest, elasticResponse, null, resolve);
             return elasticResponse;
         } catch (Exception ex) {
             LOGGER.error("geoQuery document is error :{}" ,JSON.toJSONString(geoQueryCondition), ex);
@@ -462,7 +463,7 @@ public class ElasticsearchService {
 
         QueryDataUtils.resolveQueryCondition(searchRequest, QueryDataUtils.searchGeoMatchBuilder(geoQueryCondition), geoQueryCondition);
         try {
-           responseDataUtils.wrapElasticResponse(searchRequest, elasticResponse, true, resolve);
+           responseDataUtils.wrapElasticResponse(searchRequest, elasticResponse, geoQueryCondition.getHighLightConfig(), resolve);
             return elasticResponse;
         } catch (Exception ex) {
             LOGGER.error("geoMatchQuery document is error :{}",JSON.toJSONString(geoQueryCondition), ex);

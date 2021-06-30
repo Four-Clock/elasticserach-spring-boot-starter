@@ -3,6 +3,7 @@ package com.zondy.boot.convert;
 import com.alibaba.fastjson.JSON;
 import com.zondy.boot.bean.PageView;
 import com.zondy.boot.extend.IResolveAdapterESDataRecord;
+import com.zondy.boot.model.HighLightConfig;
 import com.zondy.boot.model.MapAggregation;
 import com.zondy.boot.model.Point;
 import com.zondy.boot.util.GeoHashUtils;
@@ -18,6 +19,7 @@ import org.elasticsearch.search.aggregations.bucket.geogrid.GeoGrid;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.suggest.Suggest;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,13 +38,15 @@ import java.util.Set;
 @Slf4j
 public class ResponseDataUtils {
 
+    private static final String SOURCE_POST="_source";
+
     private RestHighLevelClient restHighLevelClient;
 
     public ResponseDataUtils(RestHighLevelClient restHighLevelClient){
         this.restHighLevelClient = restHighLevelClient;
     }
 
-    public void wrapElasticResponse(SearchRequest searchRequest, PageView<Map<String, Object>> elasticResponse, boolean isShowHight, IResolveAdapterESDataRecord... resolve) throws IOException {
+    public void wrapElasticResponse(SearchRequest searchRequest, PageView<Map<String, Object>> elasticResponse, HighLightConfig highLightConfig, IResolveAdapterESDataRecord... resolve) throws IOException {
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         RestStatus status = searchResponse.status();
         if (status == RestStatus.OK) {
@@ -50,8 +54,10 @@ public class ResponseDataUtils {
             elasticResponse.setTotal(hits.getTotalHits().value);
             hits.forEach(t -> {
                 Map<String, Object> m = t.getSourceAsMap();
-                if (isShowHight) {
-                    refreshHit(m, t.getHighlightFields());
+                if (highLightConfig!=null
+                    &&!StringUtils.isEmpty(highLightConfig.getPostTags())
+                    &&!StringUtils.isEmpty(highLightConfig.getPreTags())) {
+                    refreshHit(m, t.getHighlightFields(),highLightConfig.isWithSourceText());
                 }
                 if (resolve != null && resolve.length > 0) {
                     resolve[0].resolve(m);
@@ -130,11 +136,17 @@ public class ResponseDataUtils {
     }
 
 
-    private void refreshHit(Map<String, Object> source, Map<String, HighlightField> hight) {
+    private void refreshHit(Map<String, Object> source, Map<String, HighlightField> hight,boolean withSourceText) {
         if (hight == null) {
             return;
         }
-        hight.forEach((k, v) -> source.put(k, v.fragments()[0].string()));
+        hight.forEach((k, v) -> {
+            Object s = source.get(k);
+            source.put(k, v.fragments()[0].string());
+            if (withSourceText){
+                source.put(k+SOURCE_POST, s);
+            }
+        });
     }
 
 }

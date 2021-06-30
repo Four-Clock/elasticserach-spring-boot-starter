@@ -16,4 +16,8 @@ public class HighLightConfig {
     private String[] hightFields;
     private String postTags;
     private String preTags;
+    /**
+     * 高亮查询时是否携带原始字段
+     */
+    private boolean withSourceText;
 }
