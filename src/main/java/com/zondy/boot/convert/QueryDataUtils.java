@@ -1,6 +1,22 @@
 package com.zondy.boot.convert;
 
-import com.zondy.boot.model.*;
+import com.zondy.boot.model.BaseCondition;
+import com.zondy.boot.model.CommonCondition;
+import com.zondy.boot.model.GeoCondition;
+import com.zondy.boot.model.GeoMatchQueryCondition;
+import com.zondy.boot.model.GeoType;
+import com.zondy.boot.model.HighLightConfig;
+import com.zondy.boot.model.IHighlightEnabled;
+import com.zondy.boot.model.MatchFieldItem;
+import com.zondy.boot.model.MatchPhraseFieldItem;
+import com.zondy.boot.model.OrderEnum;
+import com.zondy.boot.model.OrderItem;
+import com.zondy.boot.model.Point;
+import com.zondy.boot.model.QueryItem;
+import com.zondy.boot.model.QueryStringAdvanceCondition;
+import com.zondy.boot.model.QueryStringCondition;
+import com.zondy.boot.model.RangeFilterCondition;
+import com.zondy.boot.model.SuggestCondition;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.geo.GeoDistance;
@@ -172,7 +188,10 @@ public class QueryDataUtils {
             }
         }
         QueryDataUtils.resolveCommonCondition(queryStringCondition, boolQuery);
-        if (queryStringCondition.getHighLightConfig() != null && queryStringCondition.getHighLightConfig().getHightFields() != null) {
+        if (queryStringCondition.getHighLightConfig() != null
+                && queryStringCondition.getHighLightConfig().getHightFields() != null
+                && !StringUtils.isEmpty(queryStringCondition.getHighLightConfig().getPreTags())
+                && !StringUtils.isEmpty(queryStringCondition.getHighLightConfig().getPostTags())) {
             HighlightBuilder highlightBuilder = getHighlightBuilder(queryStringCondition);
             searchSourceBuilder.highlighter(highlightBuilder);
         }
@@ -200,7 +219,10 @@ public class QueryDataUtils {
             boolQuery.must(queryBuilder);
         }
         QueryDataUtils.resolveCommonCondition(queryStringCondition, boolQuery);
-        if (queryStringCondition.getHightFields() != null && queryStringCondition.getHightFields().length > 0) {
+        if (queryStringCondition.getHightFields() != null
+                && queryStringCondition.getHightFields().length > 0
+                && !StringUtils.isEmpty(queryStringCondition.getPostTags())
+                && !StringUtils.isEmpty(queryStringCondition.getPreTags())) {
             HighlightBuilder highlightBuilder = getHighlightBuilder(queryStringCondition);
             searchSourceBuilder.highlighter(highlightBuilder);
         }
@@ -214,7 +236,7 @@ public class QueryDataUtils {
      * @param geoQueryCondition：查询条件
      * @return SearchSourceBuilder
      */
-    public static SearchSourceBuilder searchGeoBuilder(GeoCondition geoQueryCondition,BoolQueryBuilder queryBuilder){
+    public static SearchSourceBuilder searchGeoBuilder(GeoCondition geoQueryCondition, BoolQueryBuilder queryBuilder){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         geo(geoQueryCondition, queryBuilder, searchSourceBuilder);
         return searchSourceBuilder;
@@ -243,7 +265,10 @@ public class QueryDataUtils {
         geo(geoQueryCondition, geoBoolQueryBuilder, searchSourceBuilder);
         queryBuilder.must(geoBoolQueryBuilder);
         QueryDataUtils.resolveCommonCondition(geoQueryCondition, queryBuilder);
-        if (geoQueryCondition.getHightFields() != null && geoQueryCondition.getHightFields().length > 0) {
+        if (geoQueryCondition.getHightFields() != null
+                && geoQueryCondition.getHightFields().length > 0
+                && !StringUtils.isEmpty(geoQueryCondition.getPostTags())
+                && !StringUtils.isEmpty(geoQueryCondition.getPreTags())) {
             HighlightBuilder highlightBuilder = QueryDataUtils.getHighlightBuilder(geoQueryCondition);
             searchSourceBuilder.highlighter(highlightBuilder);
         }
