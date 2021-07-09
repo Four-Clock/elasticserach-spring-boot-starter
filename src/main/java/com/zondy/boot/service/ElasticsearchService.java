@@ -18,6 +18,7 @@ import com.zondy.boot.model.MatchCondition;
 import com.zondy.boot.model.QueryItem;
 import com.zondy.boot.model.QueryStringAdvanceCondition;
 import com.zondy.boot.model.QueryStringCondition;
+import com.zondy.boot.model.SuggestAdvanceCondition;
 import com.zondy.boot.model.SuggestCondition;
 import org.apache.commons.collections.keyvalue.DefaultKeyValue;
 import org.elasticsearch.action.ActionListener;
@@ -478,6 +479,19 @@ public class ElasticsearchService {
      * @return
      */
     public Set<String> suggest(SuggestCondition suggestCondition){
+        if (!suggestCondition.checkQueryCondition()) {
+            throw new IllegalArgumentException("查询参数有误，请检查查询参数");
+        }
+        return responseDataUtils.parseSuggestResp(QueryDataUtils.toSuggestRequest(suggestCondition));
+    }
+
+    /**
+     * 搜索建议
+     *
+     * @param suggestCondition
+     * @return
+     */
+    public Set<String> suggest(SuggestAdvanceCondition suggestCondition){
         if (!suggestCondition.checkQueryCondition()) {
             throw new IllegalArgumentException("查询参数有误，请检查查询参数");
         }

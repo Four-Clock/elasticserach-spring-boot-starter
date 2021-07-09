@@ -91,14 +91,15 @@ public class ResponseDataUtils {
         Set<String> result = new HashSet<>();
         try {
             SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> suggestion =
-                    response.getSuggest().getSuggestion("suggest");
-            List<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> entries = suggestion.getEntries();
-            for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> entry : entries) {
-                entry.getOptions().forEach(o -> {
-                    result.add(o.getText().string());
-                });
-            }
+            Suggest suggest = response.getSuggest();
+            suggest.forEach(ac->{
+                List<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> entries = ac.getEntries();
+                for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> entry : entries) {
+                    entry.getOptions().forEach(o -> {
+                        result.add(o.getText().string());
+                    });
+                }
+            });
         } catch (IOException ex) {
             log.error("query document is error :{}" , JSON.toJSONString(searchRequest), ex);
             throw new RuntimeException(ex);

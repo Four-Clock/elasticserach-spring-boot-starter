@@ -16,7 +16,9 @@ import com.zondy.boot.model.QueryItem;
 import com.zondy.boot.model.QueryStringAdvanceCondition;
 import com.zondy.boot.model.QueryStringCondition;
 import com.zondy.boot.model.RangeFilterCondition;
+import com.zondy.boot.model.SuggestAdvanceCondition;
 import com.zondy.boot.model.SuggestCondition;
+import com.zondy.boot.model.SuggestItem;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.geo.GeoDistance;
@@ -288,6 +290,24 @@ public class QueryDataUtils {
                 .prefix(suggestCondition.getValue()).size(suggestCondition.getLimit());
         SuggestBuilder suggestBuilder = new SuggestBuilder();
         suggestBuilder.addSuggestion("suggest", suggestionBuilder);
+        searchSourceBuilder.suggest(suggestBuilder);
+        searchRequest.source(searchSourceBuilder);
+        searchRequest.indices(suggestCondition.getIndex());
+        searchRequest.types(suggestCondition.getType());
+        searchRequest.searchType(SearchType.DFS_QUERY_THEN_FETCH);
+        return searchRequest;
+    }
+
+    public static SearchRequest toSuggestRequest(SuggestAdvanceCondition suggestCondition){
+        SearchRequest searchRequest = new SearchRequest();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        int index = 1;
+        SuggestBuilder suggestBuilder = new SuggestBuilder();
+        for (SuggestItem suggestItem : suggestCondition.getSuggestItems()) {
+            CompletionSuggestionBuilder suggestionBuilder = SuggestBuilders.completionSuggestion(suggestItem.getField()).skipDuplicates(true)
+                    .prefix(suggestItem.getValue()).size(suggestCondition.getLimit());
+            suggestBuilder.addSuggestion("suggest"+(index++), suggestionBuilder);
+        }
         searchSourceBuilder.suggest(suggestBuilder);
         searchRequest.source(searchSourceBuilder);
         searchRequest.indices(suggestCondition.getIndex());
