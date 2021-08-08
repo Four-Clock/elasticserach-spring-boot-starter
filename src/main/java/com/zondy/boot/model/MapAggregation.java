@@ -21,11 +21,13 @@ public class MapAggregation extends BaseCondition {
     private Integer level;
     private Point topLeft;
     private Point bottomRight;
-    private Integer aggregationType = 1;
     private String geoPoint;
     private List<QueryItem> intersectQueryItems;
+    private Integer precision;
 
     public boolean checkParam() {
-        return !(aggregationType == 0 && (topLeft == null || bottomRight == null));
+
+        return  !checkQueryCondition()||!(topLeft == null || bottomRight == null)
+                ||!(level == null || precision == null);
     }
 }

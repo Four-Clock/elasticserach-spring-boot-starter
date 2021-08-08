@@ -7,6 +7,7 @@ import com.zondy.boot.model.GeoMatchQueryCondition;
 import com.zondy.boot.model.GeoType;
 import com.zondy.boot.model.HighLightConfig;
 import com.zondy.boot.model.IHighlightEnabled;
+import com.zondy.boot.model.MapAggregation;
 import com.zondy.boot.model.MatchFieldItem;
 import com.zondy.boot.model.MatchPhraseFieldItem;
 import com.zondy.boot.model.OrderEnum;
@@ -342,24 +343,28 @@ public class QueryDataUtils {
         }
     }
 
-    public static Integer recallLevel(Integer level) {
-        int prec = 5;
-        if (level <= 2) {
-            prec = 1;
-        } else if (level <= 5) {
-            prec = 2;
-        } else if (level <= 8) {
-            prec = 3;
-        } else if (level <= 11) {
-            prec = 5;
-        } else if (level <= 13) {
-            prec = 6;
-        } else if (level <= 15) {
-            prec = 7;
-        } else {
-            prec = 8;
+    public static Integer recallLevel(MapAggregation mapAggregation) {
+        if (mapAggregation.getPrecision() != null && mapAggregation.getPrecision() >0 ){
+            return mapAggregation.getPrecision();
         }
-        return prec;
+        Integer level = mapAggregation.getLevel();
+        int precision ;
+        if (level <= 2) {
+            precision = 1;
+        } else if (level <= 5) {
+            precision = 2;
+        } else if (level <= 8) {
+            precision = 3;
+        } else if (level <= 11) {
+            precision = 5;
+        } else if (level <= 13) {
+            precision = 6;
+        } else if (level <= 15) {
+            precision = 7;
+        } else {
+            precision = 8;
+        }
+        return precision;
     }
 
     private static List<GeoPoint> convertGeoPoints(List<Point> points) {

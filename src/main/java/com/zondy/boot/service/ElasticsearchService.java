@@ -505,7 +505,10 @@ public class ElasticsearchService {
      * @return
      */
     public List<Map<String, Object>> mapAggregation(MapAggregation mapAggregation) {
-        Integer prc = QueryDataUtils.recallLevel((mapAggregation.getLevel()));
+        if (!mapAggregation.checkParam()){
+            throw new IllegalArgumentException("查询参数有误，请检查查询参数");
+        }
+        Integer prc = QueryDataUtils.recallLevel((mapAggregation));
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (mapAggregation.getBottomRight() != null && mapAggregation.getTopLeft() != null) {
             ConstantScoreQueryBuilder constantScoreQueryBuilder = QueryBuilders.constantScoreQuery(QueryBuilders.geoBoundingBoxQuery(StringUtils.isEmpty(mapAggregation.getGeoPoint()) ? "location" : mapAggregation.getGeoPoint()).setCorners(
