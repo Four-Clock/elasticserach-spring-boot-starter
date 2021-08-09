@@ -1,13 +1,19 @@
 package com.zondy.boot.convert;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zondy.boot.constant.OverMapSettings;
+import com.zondy.boot.extend.IResolveAdapterBoolQuery;
 import com.zondy.boot.model.BaseCondition;
 import com.zondy.boot.model.CommonCondition;
 import com.zondy.boot.model.GeoCondition;
 import com.zondy.boot.model.GeoMatchQueryCondition;
+import com.zondy.boot.model.GeoTitleGrid;
 import com.zondy.boot.model.GeoType;
 import com.zondy.boot.model.HighLightConfig;
 import com.zondy.boot.model.IHighlightEnabled;
 import com.zondy.boot.model.MapAggregation;
+import com.zondy.boot.model.MapGeoTileGridAggregation;
 import com.zondy.boot.model.MatchFieldItem;
 import com.zondy.boot.model.MatchPhraseFieldItem;
 import com.zondy.boot.model.OrderEnum;
@@ -20,6 +26,7 @@ import com.zondy.boot.model.RangeFilterCondition;
 import com.zondy.boot.model.SuggestAdvanceCondition;
 import com.zondy.boot.model.SuggestCondition;
 import com.zondy.boot.model.SuggestItem;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.geo.GeoDistance;
@@ -41,6 +48,8 @@ import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.util.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +61,7 @@ import java.util.Map;
  * @author liqin(zxl)
  * @date 2021/6/18
  */
+@Slf4j
 public class QueryDataUtils {
 
     /**
@@ -206,7 +216,7 @@ public class QueryDataUtils {
      * 构造 SearchSourceBuilder
      * @param queryStringCondition 查询条件
      */
-    public static SearchSourceBuilder searchBuilder(QueryStringCondition queryStringCondition){
+    public static SearchSourceBuilder searchBuilder(QueryStringCondition queryStringCondition, IResolveAdapterBoolQuery... resolveAdapterBoolQueries){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(queryStringCondition.getQueryStr())) {
@@ -221,6 +231,9 @@ public class QueryDataUtils {
             }
             boolQuery.must(queryBuilder);
         }
+        if (resolveAdapterBoolQueries != null && resolveAdapterBoolQueries.length == 1){
+            resolveAdapterBoolQueries[0].resolve(boolQuery,queryStringCondition);
+        }
         QueryDataUtils.resolveCommonCondition(queryStringCondition, boolQuery);
         if (queryStringCondition.getHightFields() != null
                 && queryStringCondition.getHightFields().length > 0
@@ -231,6 +244,24 @@ public class QueryDataUtils {
         }
         searchSourceBuilder.query(boolQuery);
         return searchSourceBuilder;
+    }
+
+
+    public static String searchGeoTileGridAggregationBuilder(MapGeoTileGridAggregation mapGeoTileGridAggregation, SearchSourceBuilder searchSourceBuilder) {
+
+        String params = searchSourceBuilder.toString();
+        JSONObject parse = JSON.parseObject(params);
+
+        GeoTitleGrid.GridSplit gridSplit  =new GeoTitleGrid.GridSplit();
+        GeoTitleGrid.Aggs aggs = new GeoTitleGrid.Aggs(new GeoTitleGrid.GridCentroid(new GeoTitleGrid.Geo_centroid(mapGeoTileGridAggregation.getGeoPoint())));
+        gridSplit.setAggs(aggs);
+        gridSplit.setGeotile_grid(new GeoTitleGrid.Geotile_grid(mapGeoTileGridAggregation.getGeoPoint(),mapGeoTileGridAggregation.getPrecision()));
+
+        Map<String,Object> gridSplitMap = new HashMap<>(2);
+        gridSplitMap.put(OverMapSettings.GRID_SPLIT,gridSplit);
+        parse.put(OverMapSettings.AGGREGATIONS,gridSplitMap);
+
+        return JSON.toJSONString(parse);
     }
 
 

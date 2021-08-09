@@ -6,14 +6,15 @@ import com.zondy.boot.bean.PageView;
 import com.zondy.boot.convert.ConvertDataUtils;
 import com.zondy.boot.convert.QueryDataUtils;
 import com.zondy.boot.convert.ResponseDataUtils;
+import com.zondy.boot.extend.IResolveAdapterBoolQuery;
 import com.zondy.boot.extend.IResolveAdapterESDataRecord;
 import com.zondy.boot.factory.ElasticSearchClientFactory;
 import com.zondy.boot.model.CommonCondition;
 import com.zondy.boot.model.FieldType;
 import com.zondy.boot.model.GeoCondition;
 import com.zondy.boot.model.GeoMatchQueryCondition;
-import com.zondy.boot.model.HighLightConfig;
 import com.zondy.boot.model.MapAggregation;
+import com.zondy.boot.model.MapGeoTileGridAggregation;
 import com.zondy.boot.model.MatchCondition;
 import com.zondy.boot.model.QueryItem;
 import com.zondy.boot.model.QueryStringAdvanceCondition;
@@ -500,10 +501,12 @@ public class ElasticsearchService {
 
     /**
      * 地图聚合查询接口
-     *
+     * mapAggregation is Deprecated
+     * @see ElasticsearchService#mapGeoTileGridAggregation(com.zondy.boot.model.MapGeoTileGridAggregation)
      * @param mapAggregation：聚合查询条件
-     * @return
+     * @return List<Map<String, Object>>
      */
+    @Deprecated
     public List<Map<String, Object>> mapAggregation(MapAggregation mapAggregation) {
         if (!mapAggregation.checkParam()){
             throw new IllegalArgumentException("查询参数有误，请检查查询参数");
@@ -534,6 +537,23 @@ public class ElasticsearchService {
         return responseDataUtils.parseGeoGridAggregationResp(searchRequest, mapAggregation);
     }
 
+
+    /**
+     * 地图热力聚合(GeoTileGrid)
+     * @param mapGeoTileGridAggregation:热力聚合参数
+     * @return List<Map<String,Object>>
+     */
+    public List<Map<String,Object>> mapGeoTileGridAggregation(MapGeoTileGridAggregation mapGeoTileGridAggregation){
+        if (!mapGeoTileGridAggregation.checkQueryCondition()) {
+            throw new IllegalArgumentException("查询参数有误，请检查查询参数");
+        }
+        SearchRequest searchRequest = new SearchRequest();
+        SearchSourceBuilder searchSourceBuilder = QueryDataUtils.searchBuilder(mapGeoTileGridAggregation, IResolveAdapterBoolQuery.DEFAULT_RESOLVE_ADAPTER_BOOL_QUERY);
+        QueryDataUtils.resolveQueryCondition(searchRequest, searchSourceBuilder, mapGeoTileGridAggregation);
+        searchSourceBuilder.size(0);
+        String json = QueryDataUtils.searchGeoTileGridAggregationBuilder(mapGeoTileGridAggregation, searchSourceBuilder);
+        return responseDataUtils.parseGeoGridAggregationResp(json, mapGeoTileGridAggregation.getIndex());
+    }
     /**
      * 关闭连接
      * @throws Exception
