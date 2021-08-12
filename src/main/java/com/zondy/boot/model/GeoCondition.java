@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 功能描述: GeoCondition
@@ -26,6 +27,9 @@ public class GeoCondition extends CommonCondition {
 
     @Override
     public boolean checkQueryCondition() {
+        if (Objects.isNull(geoType)){
+            return true;
+        }
         switch (geoType) {
             case rect:
                 return points.size() == 2;
