@@ -338,6 +338,9 @@ public class QueryDataUtils {
                     .prefix(suggestItem.getValue()).size(suggestCondition.getLimit());
             suggestBuilder.addSuggestion("suggest"+(index++), suggestionBuilder);
         }
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        QueryDataUtils.resolveCommonCondition(suggestCondition, boolQuery);
+        searchSourceBuilder.query(boolQuery);
         searchSourceBuilder.suggest(suggestBuilder);
         searchRequest.source(searchSourceBuilder);
         searchRequest.indices(suggestCondition.getIndex());
