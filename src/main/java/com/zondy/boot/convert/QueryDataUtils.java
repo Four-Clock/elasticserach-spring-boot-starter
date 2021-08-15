@@ -85,11 +85,9 @@ public class QueryDataUtils {
             }
         }
         if (queryStringCondition.getPrefixItems() != null && queryStringCondition.getPrefixItems().size() > 0) {
-            BoolQueryBuilder tmp = QueryBuilders.boolQuery();
             for (QueryItem prefixItem : queryStringCondition.getPrefixItems()) {
-                tmp.should(QueryBuilders.prefixQuery(prefixItem.getField(), prefixItem.getValue()[0]));
+                boolQuery.must(QueryBuilders.prefixQuery(prefixItem.getField(), prefixItem.getValue()[0]));
             }
-            boolQuery.must(tmp);
         }
         if (queryStringCondition.getEmptyItemFields() != null && queryStringCondition.getEmptyItemFields().size() > 0) {
             for (String emptyItem : queryStringCondition.getEmptyItemFields()) {
