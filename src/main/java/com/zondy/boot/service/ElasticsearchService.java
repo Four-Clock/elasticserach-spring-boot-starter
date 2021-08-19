@@ -16,6 +16,7 @@ import com.zondy.boot.model.GeoMatchQueryCondition;
 import com.zondy.boot.model.MapAggregation;
 import com.zondy.boot.model.MapGeoTileGridAggregation;
 import com.zondy.boot.model.MatchCondition;
+import com.zondy.boot.model.NestedQueryCondition;
 import com.zondy.boot.model.QueryItem;
 import com.zondy.boot.model.QueryStringAdvanceCondition;
 import com.zondy.boot.model.QueryStringCondition;
@@ -417,6 +418,23 @@ public class ElasticsearchService {
             responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, queryStringCondition.getHighLightConfig(), resolve);
         } catch (Exception ex) {
             LOGGER.error("query document is error :{}" ,JSON.toJSONString(queryStringCondition), ex);
+            throw new RuntimeException(ex.getMessage());
+        }
+        return elasticResponseData;
+    }
+
+    public PageView<Map<String, Object>> matchNestedQueryString(NestedQueryCondition nestedQueryCondition,IResolveAdapterESDataRecord... resolve){
+        if (!nestedQueryCondition.checkQueryCondition()) {
+            throw new IllegalArgumentException("查询参数有误，请检查查询参数是否合法");
+        }
+        PageView<Map<String, Object>> elasticResponseData = new PageView<>();
+        elasticResponseData.setPerSize(nestedQueryCondition.getPerSize());
+        SearchRequest searchRequest = new SearchRequest();
+        QueryDataUtils.resolveQueryCondition(searchRequest,  QueryDataUtils.searchBuilder(nestedQueryCondition, IResolveAdapterBoolQuery.DEFAULT_RESOLVE_ADAPTER_BOOL_QUERY), nestedQueryCondition);
+        try {
+            responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, nestedQueryCondition.getHighLightConfig(), resolve);
+        } catch (Exception ex) {
+            LOGGER.error("matchNestedQueryString is error :{}" ,JSON.toJSONString(nestedQueryCondition), ex);
             throw new RuntimeException(ex.getMessage());
         }
         return elasticResponseData;

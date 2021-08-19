@@ -416,4 +416,5 @@ public class QueryDataUtils {
         }
         boolQueryBuilder.must(rangeQueryBuilder);
     }
+
 }
