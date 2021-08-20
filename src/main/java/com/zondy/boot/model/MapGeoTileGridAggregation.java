@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class MapGeoTileGridAggregation extends QueryStringCondition{
+public class MapGeoTileGridAggregation extends QueryStringAdvanceCondition{
 
     /**
      * 一般指地图缩放级数

@@ -6,6 +6,7 @@ import com.zondy.boot.bean.PageView;
 import com.zondy.boot.convert.ConvertDataUtils;
 import com.zondy.boot.convert.QueryDataUtils;
 import com.zondy.boot.convert.ResponseDataUtils;
+import com.zondy.boot.extend.IResolveAdapterAdvanceBoolQuery;
 import com.zondy.boot.extend.IResolveAdapterBoolQuery;
 import com.zondy.boot.extend.IResolveAdapterESDataRecord;
 import com.zondy.boot.factory.ElasticSearchClientFactory;
@@ -430,7 +431,7 @@ public class ElasticsearchService {
         PageView<Map<String, Object>> elasticResponseData = new PageView<>();
         elasticResponseData.setPerSize(nestedQueryCondition.getPerSize());
         SearchRequest searchRequest = new SearchRequest();
-        QueryDataUtils.resolveQueryCondition(searchRequest,  QueryDataUtils.searchBuilder(nestedQueryCondition, IResolveAdapterBoolQuery.DEFAULT_RESOLVE_ADAPTER_BOOL_QUERY), nestedQueryCondition);
+        QueryDataUtils.resolveQueryCondition(searchRequest,  QueryDataUtils.searchAdvanceBuilder(nestedQueryCondition, IResolveAdapterAdvanceBoolQuery.DEFAULT_RESOLVE_ADAPTER_BOOL_QUERY), nestedQueryCondition);
         try {
             responseDataUtils.wrapElasticResponse(searchRequest, elasticResponseData, nestedQueryCondition.getHighLightConfig(), resolve);
         } catch (Exception ex) {
@@ -566,7 +567,7 @@ public class ElasticsearchService {
             throw new IllegalArgumentException("查询参数有误，请检查查询参数");
         }
         SearchRequest searchRequest = new SearchRequest();
-        SearchSourceBuilder searchSourceBuilder = QueryDataUtils.searchBuilder(mapGeoTileGridAggregation, IResolveAdapterBoolQuery.DEFAULT_RESOLVE_ADAPTER_BOOL_QUERY);
+        SearchSourceBuilder searchSourceBuilder = QueryDataUtils.searchAdvanceBuilder(mapGeoTileGridAggregation, IResolveAdapterAdvanceBoolQuery.DEFAULT_RESOLVE_ADAPTER_BOOL_QUERY);
         QueryDataUtils.resolveQueryCondition(searchRequest, searchSourceBuilder, mapGeoTileGridAggregation);
         searchSourceBuilder.size(0);
         String json = QueryDataUtils.searchGeoTileGridAggregationBuilder(mapGeoTileGridAggregation, searchSourceBuilder);

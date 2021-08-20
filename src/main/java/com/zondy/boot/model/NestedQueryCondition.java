@@ -16,14 +16,17 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class NestedQueryCondition extends QueryStringCondition  {
+public class NestedQueryCondition extends QueryStringAdvanceCondition  {
     private String nestedField;
 
     private List<QueryItem> nestedQueryItems;
 
+    private List<QueryItem> nestedPrefixItems;
+
     @Override
     public boolean checkQueryCondition() {
-        if (StringUtils.isEmpty(nestedField) || CollectionUtils.isEmpty(nestedQueryItems)){
+        if (StringUtils.isEmpty(nestedField)
+                || (CollectionUtils.isEmpty(nestedQueryItems) && CollectionUtils.isEmpty(nestedPrefixItems))){
             return false;
         }
         return super.checkQueryCondition();

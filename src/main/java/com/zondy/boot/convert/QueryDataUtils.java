@@ -3,6 +3,7 @@ package com.zondy.boot.convert;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zondy.boot.constant.OverMapSettings;
+import com.zondy.boot.extend.IResolveAdapterAdvanceBoolQuery;
 import com.zondy.boot.extend.IResolveAdapterBoolQuery;
 import com.zondy.boot.model.BaseCondition;
 import com.zondy.boot.model.CommonCondition;
@@ -153,7 +154,7 @@ public class QueryDataUtils {
      * 构造 SearchSourceBuilder
      * @param queryStringCondition
      */
-    public static SearchSourceBuilder searchAdvanceBuilder(QueryStringAdvanceCondition queryStringCondition){
+    public static SearchSourceBuilder searchAdvanceBuilder(QueryStringAdvanceCondition queryStringCondition, IResolveAdapterAdvanceBoolQuery... adapterAdvanceBoolQueries){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         List<MatchFieldItem> matchFieldItems = queryStringCondition.getMatchFieldItems();
@@ -173,6 +174,9 @@ public class QueryDataUtils {
                     boolQuery.must(queryBuilder);
                 }
             }
+        }
+        if (adapterAdvanceBoolQueries != null && adapterAdvanceBoolQueries.length == 1){
+            adapterAdvanceBoolQueries[0].resolve(boolQuery,queryStringCondition);
         }
         List<MatchPhraseFieldItem> mplist=queryStringCondition.getMatchPhraseFieldItems();
         if(mplist!=null && mplist.size()>0){
