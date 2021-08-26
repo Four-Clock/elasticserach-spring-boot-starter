@@ -7,7 +7,6 @@ import com.zondy.boot.convert.ConvertDataUtils;
 import com.zondy.boot.convert.QueryDataUtils;
 import com.zondy.boot.convert.ResponseDataUtils;
 import com.zondy.boot.extend.IResolveAdapterAdvanceBoolQuery;
-import com.zondy.boot.extend.IResolveAdapterBoolQuery;
 import com.zondy.boot.extend.IResolveAdapterESDataRecord;
 import com.zondy.boot.factory.ElasticSearchClientFactory;
 import com.zondy.boot.model.CommonCondition;
@@ -127,8 +126,11 @@ public class ElasticsearchService {
      * @param index:索引名称
      * @return true
      */
-    public boolean checkIndexIsExist(String index){
-        GetIndexRequest request = new GetIndexRequest().indices(index);
+    public boolean checkIndexIsExist(String index,String ... types){
+        if (types == null || types.length == 0){
+            types = new String[]{"_doc"};
+        }
+        GetIndexRequest request = new GetIndexRequest().indices(index).types(types);
         request.includeDefaults(true);
         try {
             GetIndexResponse response = restHighLevelClient.indices().get(request, RequestOptions.DEFAULT);
