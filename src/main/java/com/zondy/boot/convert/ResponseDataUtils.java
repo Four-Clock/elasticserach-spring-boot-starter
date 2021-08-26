@@ -22,7 +22,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.geogrid.GeoGrid;
+import org.elasticsearch.search.aggregations.bucket.geogrid.GeoHashGrid;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.suggest.Suggest;
@@ -58,7 +58,7 @@ public class ResponseDataUtils {
         RestStatus status = searchResponse.status();
         if (status == RestStatus.OK) {
             SearchHits hits = searchResponse.getHits();
-            elasticResponse.setTotal(hits.getTotalHits().value);
+            elasticResponse.setTotal(hits.getTotalHits());
             hits.forEach(t -> {
                 Map<String, Object> m = t.getSourceAsMap();
                 if (highLightConfig!=null
@@ -124,11 +124,11 @@ public class ResponseDataUtils {
         List<Map<String, Object>> result = new ArrayList<>();
         try {
             SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            GeoGrid geoGrid = response.getAggregations().get(OverMapSettings.REHASH);
+            GeoHashGrid geoGrid = response.getAggregations().get(OverMapSettings.REHASH);
             if (geoGrid == null){
                 return result;
             }
-            for (GeoGrid.Bucket bucket : geoGrid.getBuckets()) {
+            for (GeoHashGrid.Bucket bucket : geoGrid.getBuckets()) {
                 Map<String, Object> map = new HashMap<>(4);
                 String geoHash = bucket.getKeyAsString();
                 long docCount = bucket.getDocCount();

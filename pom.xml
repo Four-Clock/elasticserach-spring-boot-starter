@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>elasticserach-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>6.6.2</version>
     <packaging>jar</packaging>
     <description>Elasticsearch SpringBoot Starter</description>
     <developers>
@@ -20,10 +20,15 @@
         </developer>
     </developers>
 
+    <properties>
+        <es.version>6.6.2</es.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${es.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,6 +67,7 @@
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
+            <version>${es.version}</version>
         </dependency>
     </dependencies>
 
