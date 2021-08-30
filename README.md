@@ -7,7 +7,6 @@
      <version>7.8.1</version>
    </dependency>
   ```
-  
   2.添加配置(yaml配置)
   ```yaml
     liqin:
