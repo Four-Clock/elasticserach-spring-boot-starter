@@ -21,7 +21,7 @@
     </developers>
 
     <properties>
-        <es.version>6.6.2</es.version>
+        <es.version>7.8.1</es.version>
         <geohash.version>1.4.0</geohash.version>
         <fastjson.version>1.2.66</fastjson.version>
         <commons.collections.version>3.2.2</commons.collections.version>
